@@ -1,8 +1,11 @@
 package com.Clientes.controllers;
 
+import com.Clientes.assembler.ClientesModelAssembler;
 import com.Clientes.dto.ClientesDTO;
 import com.Clientes.services.ClientesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,28 +28,26 @@ public class ClientesController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientesDTO>> listar() {
-        return ResponseEntity.ok(service.listar());
-    }
+    public ResponseEntity<CollectionModel<EntityModel<ClientesDTO>>> listar() {
+        List<EntityModel<ClientesDTO>> clientes = service.listar().stream()
+            .map(assembler::toModel)
+            .toList();
 
-    // Este será el único método GET para obtener por id con HATEOAS
+    return ResponseEntity.ok(
+        CollectionModel.of(clientes,
+            linkTo(methodOn(ClientesController.class).listar()).withSelfRel()
+        )
+    );
+}
    
+    @Autowired
+private ClientesModelAssembler assembler;
+
     @GetMapping("/{id}")
-    public ResponseEntity<ClientesDTO> obtener(@PathVariable Integer id) {
+    public ResponseEntity<EntityModel<ClientesDTO>> obtener(@PathVariable Integer id) {
         return service.obtenerPorId(id)
-            .map(cliente -> {
-            ClientesDTO dto = new ClientesDTO();
-            dto.setIdCliente(cliente.getIdCliente());
-            dto.setNombreCompleto(cliente.getNombreCompleto());
-            dto.setRut(cliente.getRut());
-            dto.setDireccion(cliente.getDireccion());
-            dto.setTelefono(cliente.getTelefono());
-
-            dto.add(linkTo(methodOn(ClientesController.class).listar()).withRel("Todos los clientes"));
-
-            return ResponseEntity.ok(dto);
-        })
-        .orElse(ResponseEntity.notFound().build());
+                .map(cliente -> ResponseEntity.ok(assembler.toModel(cliente)))
+                .orElse(ResponseEntity.notFound().build());
 }
 
     @PutMapping("/{id}")
