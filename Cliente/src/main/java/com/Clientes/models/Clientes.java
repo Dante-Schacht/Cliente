@@ -12,8 +12,6 @@ public class Clientes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idCliente;
 
-    private Integer idUsuario;
-
     private String nombreCompleto;
 
     private String rut;

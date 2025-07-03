@@ -35,7 +35,6 @@ public class ClientesService {
 
     public Optional<ClientesDTO> actualizar(Integer id, ClientesDTO dto) {
         return repository.findById(id).map(cliente -> {
-            cliente.setIdUsuario(dto.getIdUsuario());
             cliente.setNombreCompleto(dto.getNombreCompleto());
             cliente.setRut(dto.getRut());
             cliente.setDireccion(dto.getDireccion());
@@ -52,11 +51,9 @@ public class ClientesService {
         return false;
     }
 
-    // Métodos auxiliares
     private ClientesDTO toDTO(Clientes cliente) {
         ClientesDTO dto = new ClientesDTO();
         dto.setIdCliente(cliente.getIdCliente());
-        dto.setIdUsuario(cliente.getIdUsuario());
         dto.setNombreCompleto(cliente.getNombreCompleto());
         dto.setRut(cliente.getRut());
         dto.setDireccion(cliente.getDireccion());
@@ -67,7 +64,6 @@ public class ClientesService {
     private Clientes toEntity(ClientesDTO dto) {
         Clientes cliente = new Clientes();
         cliente.setIdCliente(dto.getIdCliente());
-        cliente.setIdUsuario(dto.getIdUsuario());
         cliente.setNombreCompleto(dto.getNombreCompleto());
         cliente.setRut(dto.getRut());
         cliente.setDireccion(dto.getDireccion());
